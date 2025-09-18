@@ -1,0 +1,29 @@
+
+- HW (Milos)
+	- Review
+		- Photos
+			- Make global sch with 3 nodes and 4 nodes
+				- interleaving
+	- Add
+		- jumpers to
+			- turn off UART_over_LAN from Nano when programming
+			- switch between sw_ser and hw Serial
+		- 2 types of USB2UART dongles headers
+		- sw_ser header
+
+
+- Arduino IDE
+	- For start Arduino Uno + jump wires
+
+- 3 nodes
+	- 1st node:
+		- master
+		- 2 pots
+		- Analog inputs
+		- remote servo control
+	- 2nd and 3rd nodes:
+		- slave
+		- servo motor
+		- find servo code on internet
+
+	
