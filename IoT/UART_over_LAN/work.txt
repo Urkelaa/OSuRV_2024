@@ -13,17 +13,41 @@
 
 
 - Arduino IDE
-	- For start Arduino Uno + jump wires
-
-- 3 nodes
-	- 1st node:
-		- master
-		- 2 pots
-		- Analog inputs
-		- remote servo control
-	- 2nd and 3rd nodes:
-		- slave
-		- servo motor
-		- find servo code on internet
-
 	
+
+- step 1:
+	- For start Arduino Uno + jump wires + servo/pot
+	- pot connect: 5V A0 GND
+	- pot read out with ADC over analogRead()
+		- range [0, 1024)
+		- example on internet
+	- servo connect: GND 5V D9
+	- Servo lib
+		- example on internet
+		- range [0, 180]
+	- control servo position by pot position
+
+- step 2:
+	- slave.ino as code start
+	- 1st node
+		- pot
+		- protocol master
+		- send over sw_ser pkg
+	- wires
+	- 2nd node
+		- protocol slave
+		- servo
+
+- step 3
+	- Arduino Nano + UART_over_LAN shield + UTP cables + servo/pot
+	- 3 nodes
+		- 1st node:
+			- master
+			- 2 pots
+			- Analog inputs
+			- remote servo control
+		- 2nd and 3rd nodes:
+			- slave
+			- servo motor
+			- find servo code on internet
+

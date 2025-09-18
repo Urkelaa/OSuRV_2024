@@ -15,25 +15,28 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 SoftwareSerial sw_ser(SW_UART_RX, SW_UART_TX);
+
+auto& hw_ser = Serial;
+
 #define DEBUG(x) \
 	do{ \
-		sw_ser.print(#x" = "); sw_ser.println(x); \
+		hw_ser.print(#x" = "); hw_ser.println(x); \
 	}while(0)
 #define DEBUG_HEX(x) \
 	do{ \
-		sw_ser.print(#x" = 0x"); sw_ser.println(x, HEX); \
+		hw_ser.print(#x" = 0x"); hw_ser.println(x, HEX); \
 	}while(0)
 #define DEBUG_BYTES(x) \
 	do{ \
-		sw_ser.print("0x"); \
+		hw_ser.print("0x"); \
 		for(size_t i = 0; i < sizeof(x); i++){ \
 			u8 b = reinterpret_cast<const u8*>(&x)[i]; \
 			u8 nl = b & 0xf; \
 			u8 nu = b >> 4; \
-			sw_ser.print(int(nu), HEX); \
-			sw_ser.print(int(nl), HEX); \
+			hw_ser.print(int(nu), HEX); \
+			hw_ser.print(int(nl), HEX); \
 		} \
-		sw_ser.println(); \
+		hw_ser.println(); \
 	}while(0)
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,9 +46,9 @@ SoftwareSerial sw_ser(SW_UART_RX, SW_UART_TX);
 
 void setup() {
 	
-	Serial.begin(115200);
-	
 	sw_ser.begin(115200);
+	
+	hw_ser.begin(115200);
 
 
 	DEBUG(sizeof(pkg_m2s_t));
@@ -57,7 +60,7 @@ void setup() {
 void poll_pkg() {
 	watchdog_apply();
 
-	if(Serial.available() < 1){
+	if(sw_ser.available() < 1){
 		return;
 	}
 
@@ -68,12 +71,12 @@ void poll_pkg() {
 	
 	for(u8 i = 0; i < sizeof(pkg_magic_t); i++){
 		u8 b;
-		len = Serial.readBytes(
+		len = sw_ser.readBytes(
 			&b,
 			1
 		);
 		if(len != 1){
-			sw_ser.println("ERROR: Lost start of pkg!");
+			hw_ser.println("ERROR: Lost start of pkg!");
 			return;
 		}
 
@@ -84,7 +87,7 @@ void poll_pkg() {
 			reinterpret_cast<u8*>(&obs_magic)[i]
 		){
 			// Lost magic.
-			//sw_ser.println("ERROR: Lost magic!");
+			//hw_ser.println("ERROR: Lost magic!");
 			return;
 		}
 	}
@@ -92,14 +95,14 @@ void poll_pkg() {
 	pkg_m2s_t p;
 	p.magic = obs_magic;
 
-	len = Serial.readBytes(
+	len = sw_ser.readBytes(
 		reinterpret_cast<u8*>(&p) + sizeof(pkg_magic_t),
 		sizeof(p) - sizeof(pkg_magic_t)
 	);
 	
 	pkg_crc_t obs_crc = CRC16().add(p.header).add(p.payload).get_crc();
 	if(obs_crc != p.crc){
-		sw_ser.println("ERROR: Wrong CRC!");
+		hw_ser.println("ERROR: Wrong CRC!");
 		return;
 	}
 
@@ -119,7 +122,7 @@ void send_pkg() {
 
 	p.crc = CRC16().add(p.header).add(p.payload).get_crc();
 
-	Serial.write(
+	sw_ser.write(
 		reinterpret_cast<u8*>(&p),
 		sizeof(p)
 	);
